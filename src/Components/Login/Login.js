@@ -44,7 +44,7 @@ function Login() {
     <div>
       {/* Main container div for the page content */}
       <div className="container">
-        <pre>{JSON.stringify(formValues, undefined, 2)}</pre>
+        {/*<pre>{JSON.stringify(formValues, undefined, 2)}</pre>*/}
         {/* Div for login grid layout */}
         <div className="login-grid">
           {/* Div for login text */}
@@ -82,7 +82,9 @@ function Login() {
                   onChange={handleChange}
                 />
               </div>
-                <p>{ formErrors.email}</p>
+                {formErrors.email && (
+                    <p style={{ color: "red" }}>{formErrors.email}</p>
+                )}
               {/* Form group for password input */}
               <div className="form-group">
                 <label htmlFor="password">Password</label>
@@ -97,7 +99,9 @@ function Login() {
                   onChange={handleChange}
                 />
               </div>
-                <p>{ formErrors.password}</p>
+                {formErrors.password && (
+                    <p style={{ color: "red" }}>{formErrors.password}</p>
+                )}
               {/* Button group for login and reset buttons */}
               <div className="btn-group">
                 <button

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import "./Sign_Up.css"; // Optional CSS import
 
+
 function Sign_Up() {
     const initialValues = {name: "", phone: "", email: "", password: ""};
     const [formValues, setFormValues] = useState(initialValues);
@@ -54,7 +55,7 @@ function Sign_Up() {
     <div>
       {/* Main container with margin-top */}
       <div className="container" style={{ marginTop: "5%" }}>
-        <pre>{JSON.stringify(formValues, undefined, 2)}</pre>
+        {/*<pre>{JSON.stringify(formValues, undefined, 2)}</pre>*/}
         {/* Grid layout for sign-up form */}
         <div className="signup-grid">
           {/* Title for the sign-up form */}
@@ -90,7 +91,9 @@ function Sign_Up() {
                   onChange={handleChange}
                 />
               </div>
-                <p>{ formErrors.name}</p>
+                {formErrors.name && (
+                    <p style={{ color: "red" }}>{formErrors.name}</p>
+                )}
               {/* Form group for user's phone number */}
               <div className="form-group">
                 <label htmlFor="phone">Phone</label>
@@ -106,7 +109,9 @@ function Sign_Up() {
                   onChange={handleChange}
                 />
               </div>
-              <p>{ formErrors.phone}</p>
+                {formErrors.phone && (
+                    <p style={{ color: "red" }}>{formErrors.phone}</p>
+                )}
               {/* Form group for user's email */}
               <div className="form-group">
                 <label htmlFor="email">Email</label>
@@ -122,7 +127,9 @@ function Sign_Up() {
                   onChange={handleChange}
                 />
               </div>
-              <p>{ formErrors.email}</p>
+                {formErrors.email && (
+                    <p style={{ color: "red" }}>{formErrors.email}</p>
+                )}
               {/* Form group for user's password */}
               <div className="form-group">
                 <label htmlFor="password">Password</label>
@@ -137,9 +144,12 @@ function Sign_Up() {
                   value={formValues.password}
                   onChange={handleChange}
                 />
+                
               </div>
-              <p>{ formErrors.password}</p>
-              {/* Button group for form submission and reset */}
+                {formErrors.password && (
+                    <p style={{ color: "red" }}>{formErrors.password}</p>
+                )}
+                {/* Button group for form submission and reset */}
               <div className="btn-group">
                 <button
                   type="submit"
