@@ -1,63 +1,86 @@
-import React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import "./Login.css"; // Import your CSS file (if available)
+import React, { useEffect, useState } from "react";
+import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
-    const initialValues = {email: "", password: ""};
-    const [formValues, setFormValues] = useState(initialValues);
-    const [formErrors, setFormErrors] = useState({});
-    const [isSubmit, setIsSubmit] = useState(false);
-    
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormValues({ ...formValues, [name]: value });
-    };
+  const initialValues = { email: "", password: "" };
+  const [formValues, setFormValues] = useState(initialValues);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setFormErrors(validate(formValues));
-        setIsSubmit(true);
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
 
-    useEffect(() => {
-        if (Object.keys(formErrors).length === 0 && isSubmit) {
-            console.log(formValues);
-        }
-    },[formErrors]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errors = validate(formValues);
+    setFormErrors(errors);
 
-    const validate = (values) => {
-        
-        const errors = {};
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-        if (!formValues.email){
-            errors.email = "Email is required!"; 
-        }else if(!regex.test(values.email)){
-            errors.email = "This is not a valid email format!";
+    if (Object.keys(errors).length === 0) {
+      try {
+        // ✅ Replace this URL with your real backend endpoint
+        const response = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formValues),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // ✅ Save login data to sessionStorage
+          sessionStorage.setItem("auth-token", data.token);
+          sessionStorage.setItem("name", data.name);
+
+          // ✅ Redirect user and refresh Navbar
+          navigate("/");
+          window.location.reload();
+        } else {
+          // Show backend error message
+          setErrorMessage(data.message || "Invalid email or password");
         }
-        if (!formValues.password){
-            errors.password = "Password is required!"; 
-        }
-        return errors;
+      } catch (error) {
+        console.error("Login failed:", error);
+        setErrorMessage("Server error. Please try again later.");
+      }
     }
+
+    setIsSubmit(true);
+  };
+
+  const validate = (values) => {
+    const errors = {};
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+
+    if (!values.email) {
+      errors.email = "Email is required!";
+    } else if (!regex.test(values.email)) {
+      errors.email = "This is not a valid email format!";
+    }
+
+    if (!values.password) {
+      errors.password = "Password is required!";
+    }
+
+    return errors;
+  };
+
   return (
     <div>
-      {/* Main container div for the page content */}
       <div className="container">
-        {/*<pre>{JSON.stringify(formValues, undefined, 2)}</pre>*/}
-        {/* Div for login grid layout */}
         <div className="login-grid">
-          {/* Div for login text */}
           <div className="login-text">
             <h2>Login</h2>
           </div>
 
-          {/* Additional login text with a link to Sign Up page */}
           <div className="login-text">
             Are you a new member?{" "}
             <span>
               <a href="../Sign_Up/Sign_Up.html" style={{ color: "#2190FF" }}>
-                {" "}
                 Sign Up Here
               </a>
             </span>
@@ -65,10 +88,9 @@ function Login() {
 
           <br />
 
-          {/* Div for login form */}
           <div className="login-form">
-            <form>
-              {/* Form group for email input */}
+            <form onSubmit={handleSubmit}>
+              {/* Email */}
               <div className="form-group">
                 <label htmlFor="email">Email</label>
                 <input
@@ -77,15 +99,15 @@ function Login() {
                   id="email"
                   className="form-control"
                   placeholder="Enter your email"
-                  aria-describedby="helpId"
                   value={formValues.email}
                   onChange={handleChange}
                 />
               </div>
-                {formErrors.email && (
-                    <p style={{ color: "red" }}>{formErrors.email}</p>
-                )}
-              {/* Form group for password input */}
+              {formErrors.email && (
+                <p style={{ color: "red" }}>{formErrors.email}</p>
+              )}
+
+              {/* Password */}
               <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <input
@@ -94,34 +116,30 @@ function Login() {
                   id="password"
                   className="form-control"
                   placeholder="Enter your password"
-                  aria-describedby="helpId"
                   value={formValues.password}
                   onChange={handleChange}
                 />
               </div>
-                {formErrors.password && (
-                    <p style={{ color: "red" }}>{formErrors.password}</p>
-                )}
-              {/* Button group for login and reset buttons */}
+              {formErrors.password && (
+                <p style={{ color: "red" }}>{formErrors.password}</p>
+              )}
+
+              {/* Error message from backend */}
+              {errorMessage && (
+                <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
+              )}
+
+              {/* Buttons */}
               <div className="btn-group">
-                <button
-                  type="submit"
-                  className="btn btn-primary mb-2 mr-1 waves-effect waves-light"
-                  onClick={handleSubmit}
-                >
+                <button type="submit" className="btn btn-primary mb-2 mr-1">
                   Login
                 </button>
-                <button
-                  type="reset"
-                  className="btn btn-danger mb-2 waves-effect waves-light"
-                >
+                <button type="reset" className="btn btn-danger mb-2">
                   Reset
                 </button>
               </div>
 
               <br />
-
-              {/* Additional login text for 'Forgot Password' option */}
               <div className="login-text">Forgot Password?</div>
             </form>
           </div>
