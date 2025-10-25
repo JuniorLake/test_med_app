@@ -36,12 +36,15 @@ function Sign_Up() {
     if (Object.keys(errors).length !== 0) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const response = await fetch("https://juniorlake12-8181.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, phone, password }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name,
+            email,
+            password,
+            phone,
+        }),
       });
 
       const json = await response.json();

@@ -1,33 +1,28 @@
-const express = require('express');
-const cors = require('cors');
-const http = require('http');
-const connectToMongo = require('./db');
+const express = require("express");
+const cors = require("cors");
 const app = express();
+const PORT = 8181;
 
-
-app.set('view engine','ejs')
-app.use(express.static('public'))
-
-const PORT = process.env.PORT || 8181;
-
-
-// Middleware
-app.use(express.json());
-app.use(cors());
-
-// Connect to MongoDB
-connectToMongo();
-
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+// ✅ Handle CORS and OPTIONS preflight correctly
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://juniorlake12-3000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
 });
 
+app.use(express.json());
 
+// ✅ Test route
+app.post("/api/auth/register", (req, res) => {
+  console.log("✅ Received signup data:", req.body);
+  res.json({ message: "User registered successfully!" });
+});
 
-  // Start the server
 app.listen(PORT, () => {
-console.log(`Server is running on port http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
