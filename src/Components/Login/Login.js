@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config";
+
 
 function Login() {
   const initialValues = { email: "", password: "" };
@@ -23,11 +25,12 @@ function Login() {
     if (Object.keys(errors).length === 0) {
       try {
         // ✅ Replace this URL with your real backend endpoint
-        const response = await fetch("http://localhost:5000/api/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formValues),
-        });
+        const response = await fetch("https://juniorlake12-8181.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formValues),
+          });
+        
 
         const data = await response.json();
 
