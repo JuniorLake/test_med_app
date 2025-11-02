@@ -9,6 +9,8 @@ import Navbar from './Components/Navbar/Navbar';
 import Landing_Page from './Components/Landing_Page/LandingPage.js';
 import Login from './Components/Login/Login.js';
 import Sign_Up from './Components/Sign_Up/Sign_Up.js';
+import InstantConsultation from "./Components/InstantConsultationBooking/InstantConsultation.js";
+
 
 // Function component for the main App
 function App() {
@@ -28,6 +30,7 @@ function App() {
             <Route path="/" element={<Landing_Page/>}/>
             <Route path="/Login" element={<Login/>}/>
             <Route path="/Sign_Up" element={<Sign_Up/>}/>
+            <Route path="/instant-consultation" element={<InstantConsultation />} />
           </Routes>
         </BrowserRouter>
     </div>

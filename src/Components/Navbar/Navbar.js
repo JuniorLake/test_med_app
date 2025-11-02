@@ -65,6 +65,9 @@ function Navbar() {
           <li className="link">
             <Link to="#">Appointments</Link>
           </li>
+          <li className="link">
+            <Link to="/instant-consultation">Instant Booking Consultation</Link>
+          </li>
 
           {/* ✅ Conditional rendering based on login state */}
           {userName ? (
