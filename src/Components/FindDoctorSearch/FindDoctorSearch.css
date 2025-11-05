@@ -1,0 +1,34 @@
+.findDoctorSearch {
+  width: 350px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  font-size: 16px;
+}
+
+.dropdown {
+  position: absolute;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  max-height: 160px;
+  overflow-y: auto;
+  border-radius: 6px;
+  margin-top: 5px;
+  z-index: 10;
+}
+
+.dropdown li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background: #e8f2ff;
+}
