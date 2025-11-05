@@ -1,86 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import './InstantConsultation.css';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import FindDoctorSearchIC from './FindDoctorSearchIC/FindDoctorSearchIC';
-import DoctorCardIC from './DoctorCardIC/DoctorCardIC';
+import React, { useEffect, useState } from "react";
+import "./InstantConsultation.css";
+import { useSearchParams } from "react-router-dom";
+import FindDoctorSearchIC from "./FindDoctorSearchIC/FindDoctorSearchIC";
+import DoctorCard from "../../Components/InstantConsultationBooking/DoctorCardIC/DoctorCardIC.js";
 import { API_URL } from "../../config";
 
 const InstantConsultation = () => {
-    const [searchParams] = useSearchParams();
-    const [doctors, setDoctors] = useState([]);
-    const [filteredDoctors, setFilteredDoctors] = useState([]);
-    const [isSearched, setIsSearched] = useState(false);
-    
-    const getDoctorsDetails = () => {
-        fetch(`${API_URL}/api/doctors`)
-        .then(res => res.json())
-        .then(data => {
-            if (searchParams.get('speciality')) {
-                // window.reload()
-                const filtered = data.filter(doctor => doctor.speciality.toLowerCase() === searchParams.get('speciality').toLowerCase());
+  const [searchParams] = useSearchParams();
 
-                setFilteredDoctors(filtered);
-                
-                setIsSearched(true);
-                window.reload()
-            } else {
-                setFilteredDoctors([]);
-                setIsSearched(false);
-            }
-            setDoctors(data);
-        })
-        .catch(err => console.log(err));
-    }
-    const handleSearch = (searchText) => {
+  // 🧠 Local fallback doctor data
+  const [doctors, setDoctors] = useState([
+    { name: "Dr. Sarah Johnson", speciality: "Cardiologist", experience: 10, ratings: 4.8 },
+    { name: "Dr. Rakesh Mehta", speciality: "Dentist", experience: 7, ratings: 4.5 },
+    { name: "Dr. Emily Carter", speciality: "Dermatologist", experience: 12, ratings: 4.9 },
+    { name: "Dr. Alex Kim", speciality: "Neurologist", experience: 9, ratings: 4.6 },
+  ]);
 
-        if (searchText === '') {
-            setFilteredDoctors([]);
-            setIsSearched(false);
-            } else {
-                
-            const filtered = doctors.filter(
-                (doctor) =>
-                // 
-                doctor.speciality.toLowerCase().includes(searchText.toLowerCase())
-                
-            );
-                
-            setFilteredDoctors(filtered);
-            setIsSearched(true);
-            window.location.reload()
-        }
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [activeSpeciality, setActiveSpeciality] = useState(null);
+
+  // ✅ Fetch and merge doctors (runs once)
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/doctors`);
+        if (!response.ok) throw new Error("Network error");
+
+        const data = await response.json();
+        console.log("🌐 API returned:", data);
+
+        // Ensure data is always an array
+        const apiDoctors = Array.isArray(data) ? data : [data];
+
+        // Merge API + local doctors (avoid duplicates by name)
+        const merged = [
+          ...doctors,
+          ...apiDoctors.filter(
+            (apiDoc) => !doctors.some((local) => local.name === apiDoc.name)
+          ),
+        ];
+
+        console.log("🩺 Final merged list:", merged);
+        setDoctors(merged);
+      } catch (err) {
+        console.warn("⚠️ API failed, using local fallback doctors.");
+        // Keep local ones if API fails
+        setDoctors((prev) => prev);
+      }
     };
-    const navigate = useNavigate();
-    useEffect(() => {
-        getDoctorsDetails();
-        // const authtoken = sessionStorage.getItem("auth-token");
-        // if (!authtoken) {
-        //     navigate("/login");
-        // }
-    }, [searchParams])
 
-    return (
-        <center>
-            <div  className="searchpage-container">
-            <FindDoctorSearchIC onSearch={handleSearch} />
-            <div className="search-results-container">
-            {isSearched ? (
-                <center>
-                    <h2>{filteredDoctors.length} doctors are available {searchParams.get('location')}</h2>
-                    <h3>Book appointments with minimum wait-time & verified doctor details</h3>
-                    {filteredDoctors.length > 0 ? (
-                    filteredDoctors.map(doctor => <DoctorCardIC className="doctorcard" {...doctor} key={doctor.name} />)
-                    ) : (
-                    <p>No doctors found.</p>
-                    )}
-                </center>
-                ) : (
-                ''
-                )}
-            </div>
+    fetchDoctors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ✅ Handle search (filters locally)
+  const handleSearch = (searchText) => {
+    if (!searchText.trim()) {
+      setFilteredDoctors([]);
+      setActiveSpeciality(null);
+      return;
+    }
+
+    const filtered = doctors.filter((doc) =>
+      doc.speciality.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredDoctors(filtered);
+    setActiveSpeciality(searchText);
+  };
+
+  // ✅ Check for ?speciality param on first load
+  useEffect(() => {
+    const specialityFromURL = searchParams.get("speciality");
+    if (specialityFromURL) {
+      handleSearch(specialityFromURL);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const doctorsToDisplay = filteredDoctors.length > 0 ? filteredDoctors : doctors;
+  console.log("🧠 Rendering doctors:", doctorsToDisplay);
+
+  return (
+    <center>
+      <div className="searchpage-container">
+        <FindDoctorSearchIC onSearch={handleSearch} />
+
+        <div className="search-results-container">
+          <h2>
+            {doctorsToDisplay.length} doctors are available{" "}
+            {activeSpeciality ? `for ${activeSpeciality}` : ""}
+          </h2>
+          <h3>Book appointments with minimum wait-time & verified doctor details</h3>
+
+          {doctors.map((doctor) => (
+            <DoctorCard
+              key={doctor.name}
+              name={doctor.name}
+              speciality={doctor.speciality}
+              experience={doctor.experience}
+              ratings={doctor.ratings}
+              profilePic={doctor.image}
+            />
+          ))}
         </div>
-        </center>
-    )
-}
+      </div>
+    </center>
+  );
+};
 
-export default InstantConsultation
+export default InstantConsultation;
