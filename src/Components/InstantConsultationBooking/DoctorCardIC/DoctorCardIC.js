@@ -21,6 +21,13 @@ const DoctorCardIC = ({ name, speciality, experience, ratings, profilePic }) => 
     );
     setAppointments(updatedAppointments);
     alert("❌ Appointment cancelled");
+
+    // ✅ remove stored appointment
+    localStorage.removeItem(name);
+    localStorage.removeItem("doctorData");
+
+    // ✅ tell Notification component to hide
+    window.dispatchEvent(new Event("appointmentCancelled"));
   };
 
   // ✅ Handle new booking submission

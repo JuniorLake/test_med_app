@@ -19,19 +19,45 @@ const AppointmentFormIC = ({ doctorName, doctorSpeciality, onSubmit }) => {
     e.preventDefault();
 
     if (
-      !formData.name ||
-      !formData.phoneNumber ||
-      !formData.appointmentDate ||
-      !formData.appointmentTime
+        !formData.name ||
+        !formData.phoneNumber ||
+        !formData.appointmentDate ||
+        !formData.appointmentTime
     ) {
-      setError("⚠️ Please fill out all fields before booking.");
-      return;
+        setError("⚠️ Please fill out all fields before booking.");
+        return;
     }
 
     setError("");
-    onSubmit(formData);
-  };
 
+    // ✅ Save doctor info
+    localStorage.setItem(
+        "doctorData",
+        JSON.stringify({
+        name: doctorName,
+        speciality: doctorSpeciality,
+        })
+    );
+
+    // ✅ Save appointment info (this MUST match Notification.js)
+    localStorage.setItem(
+        doctorName,
+        JSON.stringify({
+        name: formData.name,
+        phone: formData.phoneNumber,
+        date: formData.appointmentDate,
+        time: formData.appointmentTime,
+        })
+    );
+
+    // Continue submitting to parent component
+    onSubmit(formData);
+
+    // ✅ Trigger Notification to appear
+    window.dispatchEvent(new Event("appointmentBooked"));
+    };
+
+ 
   return (
     <div className="appointment-form-container">
       <h3>Book Appointment</h3>

@@ -12,6 +12,7 @@ import Sign_Up from './Components/Sign_Up/Sign_Up.js';
 import InstantConsultation from "./Components/InstantConsultationBooking/InstantConsultation.js";
 import FindDoctorSearch from "./Components/FindDoctorSearch/FindDoctorSearch.js";
 import BookingConsultation from "./Components/BookingConsultation/BookingConsultation";
+import Notification from "./Components/Notification/Notification.js";
 
 // Function component for the main App
 function App() {
@@ -23,7 +24,7 @@ function App() {
         <BrowserRouter>
           {/* Display the Navbar component */}
           <Navbar/>
-          
+          <Notification />   {/* ✅ This makes notification appear */}
 
           {/* Set up the Routes for different pages */}
           <Routes>

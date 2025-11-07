@@ -1,0 +1,70 @@
+/* src/Components/Notification/Notification.css */
+
+.notification-container {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.notification-box {
+  background: #ffffff;
+  padding: 18px 22px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.12);
+  width: 260px;
+  border-left: 5px solid #3c8aff;
+}
+
+.notification-title {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #3c8aff;
+}
+
+.notification-container {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    z-index: 9999;
+  }
+  
+  .notification-card {
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-left: 6px solid #2ecc71;
+    min-width: 260px;
+    animation: slideIn 0.4s ease-out;
+  }
+  
+  .notification-card h3 {
+    margin: 0 0 10px;
+    color: #27ae60;
+  }
+  
+  .notification-card p {
+    margin: 4px 0;
+  }
+  
+  .close-btn {
+    margin-top: 10px;
+    background: #e74c3c;
+    padding: 6px 14px;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(120%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
