@@ -13,6 +13,7 @@ import InstantConsultation from "./Components/InstantConsultationBooking/Instant
 import FindDoctorSearch from "./Components/FindDoctorSearch/FindDoctorSearch.js";
 import BookingConsultation from "./Components/BookingConsultation/BookingConsultation";
 import Notification from "./Components/Notification/Notification.js";
+import ReviewForm from "./Components/ReviewForm/ReviewForm";
 
 // Function component for the main App
 function App() {
@@ -35,6 +36,7 @@ function App() {
             <Route path="/instant-consultation" element={<InstantConsultation />} />
             <Route path="/find-doctor-search" element={<FindDoctorSearch onSearch={(v)=>console.log(v)} />} />
             <Route path="/booking-consultation" element={<BookingConsultation />} />
+            <Route path="/review" element={<ReviewForm />} />
           </Routes>
         </BrowserRouter>
     </div>

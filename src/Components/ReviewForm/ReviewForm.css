@@ -1,0 +1,76 @@
+.review-wrapper {
+    padding-top: 100px;
+    max-width: 1100px;
+    margin: auto;
+  }
+  
+  .review-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .review-table th {
+    padding: 12px;
+    border: 1px solid #ddd;
+    background: #007bff;
+    color: white;
+  }
+
+  .review-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+  }
+  
+  .feedback-btn {
+    padding: 8px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .feedback-btn:disabled {
+    background: gray;
+    cursor: not-allowed;
+  }
+  
+  .review-output-cell {
+    max-width: 250px;
+  }
+  
+  .review-form-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  .review-form input,
+  .review-form select,
+  .review-form textarea {
+    margin-top: 5px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #999;
+  }
+  
+  .submit-review-btn {
+    margin-top: 15px;
+    background: green;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .warning {
+    color: red;
+    margin-bottom: 10px;
+  }
+  
