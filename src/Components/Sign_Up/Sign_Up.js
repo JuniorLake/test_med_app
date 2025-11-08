@@ -34,30 +34,29 @@ function Sign_Up() {
     const errors = validate({ name, phone, email, password });
     setFormErrors(errors);
     if (Object.keys(errors).length !== 0) return;
-
+  
     try {
-      const response = await fetch("https://juniorlake12-8181.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/auth/register", {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            name,
-            email,
-            password,
-            phone,
+          name,
+          email,
+          password,
+          phone,
         }),
       });
-
+  
       const json = await response.json();
-
+  
       if (json.authtoken) {
-        // ✅ Save data in session storage
         sessionStorage.setItem("auth-token", json.authtoken);
         sessionStorage.setItem("name", name);
         sessionStorage.setItem("phone", phone);
         sessionStorage.setItem("email", email);
-
-        navigate("/"); // redirect to home
-        window.location.reload(); // refresh navbar
+  
+        navigate("/");
+        window.location.reload();
       } else {
         if (json.errors) {
           setShowErr(json.errors[0]?.msg || "An error occurred");

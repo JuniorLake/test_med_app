@@ -1,0 +1,30 @@
+.profile-card-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  background: pink;
+}
+
+.profile-card {
+  background: pink;
+  width: 350px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+.profile-avatar {
+  margin-bottom: 15px;
+}
+
+.profile-info h2 {
+  margin: 10px 0 5px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.profile-email {
+  color: #666;
+  font-size: 16px;
+}
