@@ -82,6 +82,8 @@ function Navbar() {
           <li className="link">
             <Link to="/instant-consultation">Instant Booking</Link>
           </li>
+          <li onClick={() => navigate("/reports")}>Your Reports</li>
+
 
           {/* ✅ Logged-In Dropdown Menu */}
           {userName ? (
