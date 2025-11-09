@@ -59,17 +59,31 @@ const Notification = () => {
         <p><strong>Doctor:</strong> {doctor.name}</p>
         <p><strong>Speciality:</strong> {doctor.speciality}</p>
         <p><strong>Patient:</strong> {appointment.name}</p>
-        <p><strong>Phone:</strong> {appointment.phone}</p>
+        <p><strong>Phone:</strong> {appointment.phoneNumber}</p>
         <p>
-          <strong>Schedule:</strong> {appointment.date} at {appointment.time}
+            <strong>Schedule:</strong> {appointment.appointmentDate} at {appointment.appointmentTime}
         </p>
 
+
         <button
-          className="close-btn"
-          onClick={() => setVisible(false)}
-        >
-          Dismiss
+            className="close-btn"
+            onClick={() => {
+                if (doctor?.name) {
+                localStorage.removeItem(doctor.name);  // ✅ Remove appointment
+                }
+
+                localStorage.removeItem("doctorData");   // ✅ Remove stored doctor info
+
+                window.dispatchEvent(new Event("appointmentCancelled")); // ✅ Update all pages
+
+                setVisible(false); // ✅ Hide notification
+                setAppointment(null);
+                setDoctor(null);
+            }}
+            >
+            Cancel Appointment
         </button>
+
       </div>
     </div>
   );

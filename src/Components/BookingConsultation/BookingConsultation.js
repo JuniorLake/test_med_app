@@ -1,82 +1,113 @@
 import React, { useEffect, useState } from "react";
 import "./BookingConsultation.css";
-import FindDoctorSearch from "../FindDoctorSearch/FindDoctorSearch";
-import DoctorCard from "../DoctorCard/DoctorCard";
+import DoctorCardIC from "../InstantConsultationBooking/DoctorCardIC/DoctorCardIC.js";
 import { API_URL } from "../../config";
 
 const BookingConsultation = () => {
-  const [doctors, setDoctors] = useState([
-    { name: "Dr. Sarah Johnson", speciality: "Cardiologist", experience: 10, ratings: 4.8 },
-    { name: "Dr. Rakesh Mehta", speciality: "Dentist", experience: 7, ratings: 4.5 },
-    { name: "Dr. Emily Carter", speciality: "Dermatologist", experience: 12, ratings: 4.9 },
-    { name: "Dr. Alex Kim", speciality: "Neurologist", experience: 9, ratings: 4.6 },
-  ]);
+  const [doctors, setDoctors] = useState([]);
+  const [appointments, setAppointments] = useState({}); // { doctorName: appointmentObj }
 
-  const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const [isSearched, setIsSearched] = useState(false);
-
-  // ✅ Fetch doctors (optional backend fetch)
-  const fetchDoctors = async () => {
+  // ✅ Fetch doctors from API or fallback
+  const loadDoctors = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/doctors`);
-      if (response.ok) {
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setDoctors(data);
-        }
+      const res = await fetch(`${API_URL}/api/doctors`);
+      if (res.ok) {
+        const data = await res.json();
+        setDoctors(data);
+        return;
       }
     } catch (err) {
-      console.warn("⚠️ Using local fallback doctors");
+      console.log("⚠️ API offline, using fallback doctors");
     }
+
+    // ✅ fallback list
+    setDoctors([
+      { name: "Dr. Sarah Johnson", speciality: "Cardiologist", experience: 10, ratings: 4.8 },
+      { name: "Dr. Rakesh Mehta", speciality: "Dentist", experience: 7, ratings: 4.5 },
+      { name: "Dr. Emily Carter", speciality: "Dermatologist", experience: 12, ratings: 4.9 },
+      { name: "Dr. Alex Kim", speciality: "Neurologist", experience: 9, ratings: 4.6 },
+    ]);
   };
 
-  // ✅ Filter doctors by speciality
-  const handleSearch = (searchText) => {
-    if (!searchText.trim()) {
-      setFilteredDoctors([]);
-      setIsSearched(false);
-      return;
+  // ✅ Load appointments from localStorage
+  const loadAppointments = () => {
+    const booked = {};
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+
+      if (
+        key === "auth-token" ||
+        key === "doctorData" ||
+        key === "email" ||
+        key === "name" ||
+        key === "phone"
+      ) {
+        continue;
+      }
+
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+
+        if (data?.appointmentDate && data?.appointmentTime) {
+          booked[key] = data;
+        }
+      } catch {
+        continue;
+      }
     }
 
-    const filtered = doctors.filter((doc) =>
-      doc.speciality.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredDoctors(filtered);
-    setIsSearched(true);
+    setAppointments(booked);
+  };
+
+  // ✅ Cancel appointment handler
+  const cancelAppointment = (doctorName) => {
+    localStorage.removeItem(doctorName);
+    localStorage.removeItem("doctorData");
+
+    loadAppointments(); // refresh list
+
+    // Notify Reports layout + Notification banner
+    window.dispatchEvent(new Event("appointmentCancelled"));
+  };
+
+  // ✅ When user books a new appointment inside DoctorCard
+  const handleAppointmentBooked = () => {
+    loadAppointments();
   };
 
   useEffect(() => {
-    fetchDoctors();
-  }, []);
+    loadDoctors();
+    loadAppointments();
 
-  const doctorsToDisplay = isSearched ? filteredDoctors : doctors;
+    // Listen for cancellation events
+    window.addEventListener("appointmentCancelled", loadAppointments);
+
+    return () => {
+      window.removeEventListener("appointmentCancelled", loadAppointments);
+    };
+  }, []);
 
   return (
     <center>
-      <div className="searchpage-container">
-        <FindDoctorSearch onSearch={handleSearch} />
-        <div className="search-results-container">
-          <h2>
-            {doctorsToDisplay.length} doctors available{" "}
-            {isSearched && filteredDoctors.length > 0 ? "(filtered)" : ""}
-          </h2>
-          <h3>Book or cancel appointments with verified doctors</h3>
+      <div className="appointments-container">
+        <h1>Available Doctors</h1>
 
-          {doctorsToDisplay.length > 0 ? (
-            doctorsToDisplay.map((doctor) => (
-              <DoctorCard
-                key={doctor.name}
-                name={doctor.name}
-                speciality={doctor.speciality}
-                experience={doctor.experience}
-                ratings={doctor.ratings}
-                profilePic={doctor.image}
-              />
-            ))
-          ) : (
-            <p>No doctors found.</p>
-          )}
-        </div>
+        {doctors.length === 0 ? (
+          <p>No doctors available.</p>
+        ) : (
+          doctors.map((doc) => (
+            <DoctorCardIC
+                key={doc.name}
+                name={doc.name}
+                speciality={doc.speciality}
+                experience={doc.experience}
+                ratings={doc.ratings}
+                profilePic={doc.image}
+                // ✅ DoctorCardIC automatically opens AppointmentFormIC when booking
+            />
+          ))
+        )}
       </div>
     </center>
   );

@@ -41,7 +41,7 @@ const InstantConsultation = () => {
         ];
 
         console.log("🩺 Final merged list:", merged);
-        setDoctors(merged);
+        setDoctors(apiDoctors.length > 0 ? apiDoctors : doctors);
       } catch (err) {
         console.warn("⚠️ API failed, using local fallback doctors.");
         // Keep local ones if API fails
@@ -92,7 +92,7 @@ const InstantConsultation = () => {
           </h2>
           <h3>Book appointments with minimum wait-time & verified doctor details</h3>
 
-          {doctors.map((doctor) => (
+          {doctorsToDisplay.map((doctor) => (
             <DoctorCard
               key={doctor.name}
               name={doctor.name}

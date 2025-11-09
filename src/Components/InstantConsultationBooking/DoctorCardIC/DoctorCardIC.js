@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
 import "./DoctorCardIC.css";
@@ -9,36 +9,53 @@ const DoctorCardIC = ({ name, speciality, experience, ratings, profilePic }) => 
   const [showModal, setShowModal] = useState(false);
   const [appointments, setAppointments] = useState([]);
 
+  // ✅ Load saved appointment on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(name);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setAppointments([{ id: uuidv4(), ...parsed }]);
+    }
+  }, [name]);
+
   // ✅ Open booking modal
   const handleBooking = () => {
     setShowModal(true);
   };
 
   // ✅ Cancel existing appointment
-  const handleCancel = (appointmentId) => {
-    const updatedAppointments = appointments.filter(
-      (appointment) => appointment.id !== appointmentId
-    );
-    setAppointments(updatedAppointments);
-    alert("❌ Appointment cancelled");
-
-    // ✅ remove stored appointment
+  const handleCancel = (id) => {
     localStorage.removeItem(name);
     localStorage.removeItem("doctorData");
 
-    // ✅ tell Notification component to hide
+    setAppointments([]); // UI update
+    alert("❌ Appointment cancelled");
+
+    // ✅ Notify other components (ReportsLayout, Notification)
     window.dispatchEvent(new Event("appointmentCancelled"));
   };
 
   // ✅ Handle new booking submission
   const handleFormSubmit = (appointmentData) => {
-    const newAppointment = {
-      id: uuidv4(),
-      ...appointmentData,
-    };
-    setAppointments([...appointments, newAppointment]);
+    const newAppointment = { id: uuidv4(), ...appointmentData };
+
+    // ✅ Save appointment
+    localStorage.setItem(name,JSON.stringify({...appointmentData,doctorSpeciality: speciality}));
+
+
+    // ✅ Save doctor info for reports/notification
+    localStorage.setItem(
+      "doctorData",
+      JSON.stringify({ name, speciality })
+    );
+
+    setAppointments([newAppointment]);
     setShowModal(false);
+
     alert("✅ Appointment booked successfully!");
+
+    // ✅ Notify Notification + ReportsLayout
+    window.dispatchEvent(new Event("appointmentBooked"));
   };
 
   return (
@@ -112,6 +129,7 @@ const DoctorCardIC = ({ name, speciality, experience, ratings, profilePic }) => 
           {appointments.length > 0 ? (
             <>
               <h3 style={{ textAlign: "center" }}>Appointment Booked!</h3>
+
               {appointments.map((appointment) => (
                 <div className="bookedInfo" key={appointment.id}>
                   <p>Name: {appointment.name}</p>
@@ -120,6 +138,7 @@ const DoctorCardIC = ({ name, speciality, experience, ratings, profilePic }) => 
                     Appointment: {appointment.appointmentDate} at{" "}
                     {appointment.appointmentTime}
                   </p>
+
                   <button onClick={() => handleCancel(appointment.id)}>
                     Cancel Appointment
                   </button>

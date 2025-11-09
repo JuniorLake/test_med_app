@@ -9,48 +9,48 @@ const ReportsLayout = () => {
     loadReportsFromAppointments();
   }, []);
 
-  // ✅ Load reports only for doctors the user has booked
+  // ✅ Load only REAL appointments from localStorage
   const loadReportsFromAppointments = () => {
     const reportList = [];
 
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
 
-      // Skip unrelated items (tokens, review data, session info)
+      // ✅ Skip non-appointment entries
       if (
-        key === "doctorData" ||
         key === "auth-token" ||
         key === "email" ||
         key === "name" ||
-        key === "phone"
+        key === "phone" ||
+        key === "doctorData" ||
+        key.startsWith("react") ||
+        key.startsWith("persist:")
       ) {
         continue;
       }
 
+      let appointment;
       try {
-        const appointment = JSON.parse(localStorage.getItem(key));
+        appointment = JSON.parse(localStorage.getItem(key));
+      } catch {
+        continue; // skip invalid JSON entries
+      }
 
-        // Only count valid doctor appointments
-        if (
-          appointment &&
-          appointment.date &&
-          appointment.time &&
-          appointment.name
-        ) {
-          // We also need doctor speciality from doctorData (you stored last selected)
-          const doctorMeta = localStorage.getItem("doctorData");
-          const metaObj = doctorMeta ? JSON.parse(doctorMeta) : null;
-
-          reportList.push({
-            id: reportList.length + 1,
-            doctor: key,
-            speciality: metaObj?.speciality || "N/A",
-            date: appointment.date,
-            summary: `Appointment with ${key} at ${appointment.time}.`
-          });
-        }
-      } catch (err) {
-        console.log("Skipping non-JSON localStorage key:", key);
+      // ✅ Validate appointment fields
+      if (
+        appointment &&
+        appointment.appointmentDate &&
+        appointment.appointmentTime &&
+        appointment.name // patient name
+      ) {
+        reportList.push({
+          id: reportList.length + 1,
+          doctor: key, // doctor name is the key
+          speciality: appointment.doctorSpeciality || "N/A",
+          date: appointment.appointmentDate,
+          time: appointment.appointmentTime,
+          summary: `Consultation with ${key} at ${appointment.appointmentTime}.`
+        });
       }
     }
 
@@ -68,10 +68,11 @@ const ReportsLayout = () => {
     doc.text(`Doctor: ${report.doctor}`, 20, 40);
     doc.text(`Speciality: ${report.speciality}`, 20, 50);
     doc.text(`Date: ${report.date}`, 20, 60);
+    doc.text(`Time: ${report.time}`, 20, 70);
 
-    doc.text("Summary:", 20, 75);
-    const wrappedSummary = doc.splitTextToSize(report.summary, 170);
-    doc.text(wrappedSummary, 20, 85);
+    doc.text("Summary:", 20, 90);
+    const wrappedText = doc.splitTextToSize(report.summary, 170);
+    doc.text(wrappedText, 20, 100);
 
     return doc;
   };
@@ -79,7 +80,7 @@ const ReportsLayout = () => {
   // ✅ Download PDF
   const downloadPdf = (report) => {
     const doc = buildPdf(report);
-    doc.save(`Report_${report.id}.pdf`);
+    doc.save(`Report_${report.doctor}.pdf`);
   };
 
   // ✅ View PDF in new tab
